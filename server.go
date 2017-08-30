@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,12 +31,14 @@ func (s *Server) Hello(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	filename := flag.String("file", "novalid", "the file to be served")
+	port := flag.Int("port", -1, "The port for the server to bind to")
 	flag.Parse()
 	if _, err := os.Stat(*filename); os.IsNotExist(err) {
-		log.Fatalf("given file not exists\n")
+		log.Fatalf("given file %v not exists\n", *filename)
 	}
 
 	s := &Server{filename: *filename}
 	http.HandleFunc("/", s.Hello)
-	http.ListenAndServe(":8000", nil)
+	hostport := fmt.Sprintf(":%v", *port)
+	http.ListenAndServe(hostport, nil)
 }
